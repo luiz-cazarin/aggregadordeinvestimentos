@@ -13,6 +13,10 @@ public class Account {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID account_id;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
     @Column(name = "description")
     private String description;
 
@@ -38,5 +42,13 @@ public class Account {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }
