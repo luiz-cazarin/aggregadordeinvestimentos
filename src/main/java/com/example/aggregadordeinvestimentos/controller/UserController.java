@@ -44,19 +44,21 @@ public class UserController {
         }
     }
 
-    @DeleteMapping("/{userId}")
+    @DeleteMapping("/user/{userId}")
     public ResponseEntity<User> deleteUser(@PathVariable("userId") String userId) {
         userService.deleteUser(userId);
         return ResponseEntity.noContent().build();
     }
 
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<User> deleteUsserById(@PathVariable("userId") String userId) {
+        userService.deleteById(userId);
+        return ResponseEntity.noContent().build();
+    }
+
     @PutMapping("/{userId}")
     public ResponseEntity<User> updateUser(@PathVariable("userId") String userId, @RequestBody UpdateUserDto updateUserDto) {
-        var user = userService.updateUser(userId, updateUserDto);
-        if (user.isPresent()) {
-            return ResponseEntity.ok(user.get());
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        userService.updateUser(userId, updateUserDto);
+        return ResponseEntity.noContent().build();
     }
 }

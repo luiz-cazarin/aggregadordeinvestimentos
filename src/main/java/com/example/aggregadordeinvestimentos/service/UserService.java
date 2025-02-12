@@ -56,7 +56,16 @@ public class UserService {
         return user;
     }
 
-    public Optional<User> updateUser(String userId, UpdateUserDto updateUserDto) {
+    public void deleteById(String userId) {
+        var id = UUID.fromString(userId);
+        var user = userRepository.existsById(id);
+
+        if (user) {
+            userRepository.deleteById(id);
+        }
+    }
+
+    public void updateUser(String userId, UpdateUserDto updateUserDto) {
         var userEntity =  userRepository.findById(UUID.fromString(userId));
         if (userEntity.isPresent()) {
             var user = userEntity.get();
@@ -67,13 +76,7 @@ public class UserService {
                 user.setPassword(updateUserDto.password());
             }
 
-            try {
-                return Optional.of(userRepository.save(user));
-            } catch (OptimisticLockException e) {
-                return Optional.empty();
-            }
-        } else {
-            return Optional.empty();
+            userRepository.save(user);
         }
     }
 }
