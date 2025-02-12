@@ -1,4 +1,4 @@
-package com.example.aggregadordeinvestimentos.controller;
+package com.example.aggregadordeinvestimentos.controller.dto;
 
 public record CreateUserDto(String username, String email, String password) {
 }

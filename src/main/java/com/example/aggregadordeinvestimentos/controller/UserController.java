@@ -1,5 +1,7 @@
 package com.example.aggregadordeinvestimentos.controller;
 
+import com.example.aggregadordeinvestimentos.controller.dto.CreateUserDto;
+import com.example.aggregadordeinvestimentos.controller.dto.UpdateUserDto;
 import com.example.aggregadordeinvestimentos.entity.User;
 import com.example.aggregadordeinvestimentos.service.UserService;
 import org.springframework.http.ResponseEntity;

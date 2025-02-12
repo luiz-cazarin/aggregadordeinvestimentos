@@ -1,7 +1,7 @@
 package com.example.aggregadordeinvestimentos.service;
 
-import com.example.aggregadordeinvestimentos.controller.CreateUserDto;
-import com.example.aggregadordeinvestimentos.controller.UpdateUserDto;
+import com.example.aggregadordeinvestimentos.controller.dto.CreateUserDto;
+import com.example.aggregadordeinvestimentos.controller.dto.UpdateUserDto;
 import com.example.aggregadordeinvestimentos.entity.User;
 import com.example.aggregadordeinvestimentos.repository.UserRepository;
 import jakarta.persistence.OptimisticLockException;
