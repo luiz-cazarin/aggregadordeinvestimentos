@@ -1,5 +1,6 @@
 package com.example.aggregadordeinvestimentos.controller;
 
+import com.example.aggregadordeinvestimentos.controller.dto.CreateAccountDto;
 import com.example.aggregadordeinvestimentos.controller.dto.CreateUserDto;
 import com.example.aggregadordeinvestimentos.controller.dto.UpdateUserDto;
 import com.example.aggregadordeinvestimentos.entity.User;
@@ -62,5 +63,11 @@ public class UserController {
     public ResponseEntity<User> updateUser(@PathVariable("userId") String userId, @RequestBody UpdateUserDto updateUserDto) {
         userService.updateUser(userId, updateUserDto);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{userId}/accounts")
+    public ResponseEntity<User> createAccount(@PathVariable("userId") String userId, @RequestBody CreateAccountDto createAccountDto) {
+        userService.createAccount(userId, createAccountDto);
+        return ResponseEntity.ok().build();
     }
 }

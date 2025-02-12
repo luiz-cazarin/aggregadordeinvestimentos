@@ -1,5 +1,6 @@
 package com.example.aggregadordeinvestimentos.entity;
 
+import com.example.aggregadordeinvestimentos.controller.dto.CreateAccountDto;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -100,5 +101,8 @@ public class User {
 
     public void setAccounts(List<Account> accounts) {
         this.accounts = accounts;
+    }
+
+    public void addAccount(CreateAccountDto createAccountDto) {
     }
 }
