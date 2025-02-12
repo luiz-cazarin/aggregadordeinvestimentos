@@ -17,11 +17,17 @@ public class Account {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @OneToOne(mappedBy = "account")
+    @PrimaryKeyJoinColumn
+    private BillingAddress billingAddress;
+
     @Column(name = "description")
     private String description;
 
-    public Account(UUID account_id, String description) {
+    public Account(UUID account_id, User user, BillingAddress billingAddress, String description) {
         this.account_id = account_id;
+        this.user = user;
+        this.billingAddress = billingAddress;
         this.description = description;
     }
 
@@ -50,5 +56,13 @@ public class Account {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public BillingAddress getBillingAddress() {
+        return billingAddress;
+    }
+
+    public void setBillingAddress(BillingAddress billingAddress) {
+        this.billingAddress = billingAddress;
     }
 }
