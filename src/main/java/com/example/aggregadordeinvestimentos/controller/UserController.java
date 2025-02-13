@@ -1,8 +1,10 @@
 package com.example.aggregadordeinvestimentos.controller;
 
+import com.example.aggregadordeinvestimentos.controller.dto.AccountResponseDto;
 import com.example.aggregadordeinvestimentos.controller.dto.CreateAccountDto;
 import com.example.aggregadordeinvestimentos.controller.dto.CreateUserDto;
 import com.example.aggregadordeinvestimentos.controller.dto.UpdateUserDto;
+import com.example.aggregadordeinvestimentos.entity.Account;
 import com.example.aggregadordeinvestimentos.entity.User;
 import com.example.aggregadordeinvestimentos.service.UserService;
 import org.springframework.http.ResponseEntity;
@@ -69,5 +71,12 @@ public class UserController {
     public ResponseEntity<User> createAccount(@PathVariable("userId") String userId, @RequestBody CreateAccountDto createAccountDto) {
         userService.createAccount(userId, createAccountDto);
         return ResponseEntity.ok().build();
+    }
+
+
+    @GetMapping("/{userId}/accounts")
+    public ResponseEntity<List<AccountResponseDto>> getAccounts(@PathVariable("userId") String userId) {
+        var accounts = userService.getAccounts(userId);
+        return ResponseEntity.ok(accounts);
     }
 }
