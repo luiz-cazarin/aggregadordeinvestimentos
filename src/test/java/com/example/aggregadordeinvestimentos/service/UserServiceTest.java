@@ -1,8 +1,12 @@
 package com.example.aggregadordeinvestimentos.service;
 
+import com.example.aggregadordeinvestimentos.controller.dto.CreateAccountDto;
 import com.example.aggregadordeinvestimentos.controller.dto.CreateUserDto;
 import com.example.aggregadordeinvestimentos.controller.dto.UpdateUserDto;
+import com.example.aggregadordeinvestimentos.entity.Account;
 import com.example.aggregadordeinvestimentos.entity.User;
+import com.example.aggregadordeinvestimentos.repository.AccountRepository;
+import com.example.aggregadordeinvestimentos.repository.BillingAddressRepository;
 import com.example.aggregadordeinvestimentos.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -15,6 +19,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -35,13 +40,29 @@ class UserServiceTest {
     @Mock
     private UserRepository userRepository;
 
+    // Criando um mock do AccountRepository
+    @Mock
+    private AccountRepository accountRepository;
+
+    // Criando um mock do BillingAddressRepository
+    @Mock
+    private BillingAddressRepository billingAddressRepository;
+
     // Injetando o mock do UserRepository no UserService
     @InjectMocks
     private UserService userService;
 
+    // Injetando o mock do AccountService no AccountService
+    @InjectMocks
+    private AccountService accountService;
+
     // Criando um captor para capturar o usuário que está sendo salvo
     @Captor
     private ArgumentCaptor<User> userCaptor;
+
+    // Criando um captor para capturar o account que está sendo salvo
+    @Captor
+    private ArgumentCaptor<Account> accountCaptor;
 
     @Captor
     private ArgumentCaptor<UUID> uuidCaptor;
@@ -300,5 +321,82 @@ class UserServiceTest {
             verify(userRepository, times(0)).save(any());
         }
     }
-  
+
+    @Nested
+    class createAccount {
+        @Test
+        @DisplayName("Should create account successfully")
+        void shouldCreateAccountSuccessfully() {
+            var userId = UUID.randomUUID();
+            var user = new User(
+                    userId,
+                    "username",
+                    "user@mail.com",
+                    "1234",
+                    Instant.now(),
+                    null
+            );
+
+            var accountDto = new CreateAccountDto(
+                    "description",
+                    "Street Name",
+                    123
+            );
+
+            doReturn(Optional.of(user)).when(userRepository).findById(userId);
+            doReturn(new Account(UUID.randomUUID(), user, null, new ArrayList<>(), accountDto.description()))
+                    .when(accountRepository).save(any());
+
+            // Act
+            userService.createAccount(userId.toString(), accountDto);
+
+            // Assert
+            verify(userRepository, times(1)).findById(userId);
+            verify(accountRepository, times(1)).save(accountCaptor.capture());
+            verify(billingAddressRepository, times(1)).save(any());
+        }
+
+    }
+
+    @Nested
+    class getAccounts {
+        @Test
+        @DisplayName("Should return account list successfully")
+        void shouldReturnAccountListSuccessfully() {
+            // Arrange
+            var userId = UUID.randomUUID();
+            var user = new User(
+                    userId,
+                    "username",
+                    "user@mail.com",
+                    "1234",
+                    Instant.now(),
+                    null
+            );
+
+            var account = new Account(
+                    UUID.randomUUID(),
+                    user, null,
+                    new ArrayList<>(),
+                    "description"
+            );
+
+            // Associando a conta ao usuário
+            user.setAccounts(List.of(account));
+
+            doReturn(Optional.of(user)).when(userRepository).findById(userId);
+
+            // Act
+            var output = userService.getAccounts(userId.toString());
+
+            // Assert
+            verify(userRepository, times(1)).findById(userId);
+            assertNotNull(output);
+            assertEquals(1, output.size());
+            assertEquals(account.getAccount_id().toString(), output.get(0).account_id());
+            assertEquals(account.getDescription(), output.get(0).description());
+        }
+
+    }
+
 }
