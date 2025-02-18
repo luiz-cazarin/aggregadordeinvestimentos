@@ -1,5 +1,8 @@
 package com.example.aggregadordeinvestimentos.service;
 
+import com.example.aggregadordeinvestimentos.client.BrapiClient;
+import com.example.aggregadordeinvestimentos.client.dto.BrapiResponseDto;
+import com.example.aggregadordeinvestimentos.client.dto.StockDto;
 import com.example.aggregadordeinvestimentos.controller.dto.AcccountStockResponseDto;
 import com.example.aggregadordeinvestimentos.controller.dto.AssociateAccountStockDto;
 import com.example.aggregadordeinvestimentos.controller.dto.CreateStockDto;
@@ -16,6 +19,7 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -46,6 +50,9 @@ class AccountServiceTest {
     @Mock
     private StockRepository stockRepository;
 
+    @Mock
+    private BrapiClient brapiClient;
+
     // Injetando o mock de StockRepository em StockService
     @InjectMocks
     private AccountService accountService;
@@ -59,6 +66,10 @@ class AccountServiceTest {
 
     @Nested
     class associateStock {
+
+        @Value("#{environment.TOKEN}")
+        private String TOKEN;
+
 
         @Test
         @DisplayName("Should associate stock with success")
@@ -136,10 +147,7 @@ class AccountServiceTest {
                     new ArrayList<>(),
                     "description"
             );
-            var stock = new Stock(
-                    "PETR4",
-                    "Petrobras"
-            );
+            var stock = new Stock("PETR4", "Petrobras");
 
             var accountStock = new AccountStock(
                     new AccountStockId(account.getAccount_id(), stock.getStock_id()),
@@ -148,9 +156,17 @@ class AccountServiceTest {
                     10
             );
 
-            account.setAccountStocks(List.of(accountStock));
+            var stockDto = new StockDto(3.0);
+
+            // Adiciona a associação corretamente
+            account.getAccountStocks().add(accountStock);
+
+            // simulando retorno do repository
+            var mockResponse = new BrapiResponseDto(List.of(stockDto));
 
             doReturn(Optional.of(account)).when(accountRepository).findById(accountId);
+            doReturn(mockResponse).when(brapiClient).getQuote(TOKEN, "PETR4");
+
             // Act
             var output = accountService.getStocks(accountId.toString());
 
