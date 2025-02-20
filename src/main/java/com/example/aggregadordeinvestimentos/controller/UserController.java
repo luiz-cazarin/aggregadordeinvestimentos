@@ -4,9 +4,9 @@ import com.example.aggregadordeinvestimentos.controller.dto.AccountResponseDto;
 import com.example.aggregadordeinvestimentos.controller.dto.CreateAccountDto;
 import com.example.aggregadordeinvestimentos.controller.dto.CreateUserDto;
 import com.example.aggregadordeinvestimentos.controller.dto.UpdateUserDto;
-import com.example.aggregadordeinvestimentos.entity.Account;
 import com.example.aggregadordeinvestimentos.entity.User;
 import com.example.aggregadordeinvestimentos.service.UserService;
+import jakarta.transaction.Transactional;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

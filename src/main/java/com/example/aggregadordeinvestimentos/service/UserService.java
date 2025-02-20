@@ -34,7 +34,6 @@ public class UserService {
     }
 
     public UUID createUser(CreateUserDto createUserDto) {
-
         // DTO -> ENTITY
         var entity = new User(
                 UUID.randomUUID(),
