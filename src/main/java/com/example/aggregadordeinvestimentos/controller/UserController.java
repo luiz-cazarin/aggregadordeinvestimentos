@@ -23,6 +23,7 @@ public class UserController {
         this.userService = userService;
     }
 
+    @Transactional
     @PostMapping
     public ResponseEntity<User> createUser(@RequestBody CreateUserDto createUserDto) {
         var userId = userService.createUser(createUserDto);

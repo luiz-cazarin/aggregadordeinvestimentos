@@ -6,42 +6,49 @@ import com.example.aggregadordeinvestimentos.controller.dto.CreateUserDto;
 import com.example.aggregadordeinvestimentos.controller.dto.UpdateUserDto;
 import com.example.aggregadordeinvestimentos.entity.Account;
 import com.example.aggregadordeinvestimentos.entity.BillingAddress;
+import com.example.aggregadordeinvestimentos.entity.Role;
 import com.example.aggregadordeinvestimentos.entity.User;
 import com.example.aggregadordeinvestimentos.repository.AccountRepository;
 import com.example.aggregadordeinvestimentos.repository.BillingAddressRepository;
+import com.example.aggregadordeinvestimentos.repository.RoleRepository;
 import com.example.aggregadordeinvestimentos.repository.UserRepository;
 import jakarta.persistence.OptimisticLockException;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class UserService {
     private UserRepository userRepository;
     private AccountRepository accountRepository;
     private BillingAddressRepository billingAddressRepository;
+    private RoleRepository roleRepository;
+    private BCryptPasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository, AccountRepository accountRepository, BillingAddressRepository billingAddressRepository) {
+    public UserService(UserRepository userRepository, AccountRepository accountRepository, BillingAddressRepository billingAddressRepository, RoleRepository roleRepository, BCryptPasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.accountRepository = accountRepository;
         this.billingAddressRepository = billingAddressRepository;
+        this.roleRepository = roleRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public UUID createUser(CreateUserDto createUserDto) {
+        var basicRole = roleRepository.findByName(Role.Values.BASIC.name());
+
         // DTO -> ENTITY
         var entity = new User(
                 UUID.randomUUID(),
                 createUserDto.username(),
                 createUserDto.email(),
-                createUserDto.password(),
+                passwordEncoder.encode(createUserDto.password()),
                 Instant.now(),
-                null);
+                null,
+                basicRole);
 
         var userSaved = userRepository.save(entity);
 

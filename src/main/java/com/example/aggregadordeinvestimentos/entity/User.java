@@ -54,13 +54,14 @@ public class User {
     public User() {
     }
 
-    public User(UUID userId, String username, String email, String password, Instant creationTimestamp, Instant updateTimestamp) {
+    public User(UUID userId, String username, String email, String password, Instant creationTimestamp, Instant updateTimestamp, Role role) {
         this.userId = userId;
         this.username = username;
         this.email = email;
         this.password = password;
         this.creationTimestamp = creationTimestamp;
         this.updateTimestamp = updateTimestamp;
+        this.roles = Set.of(role);
     }
 
     public UUID getUserId() {
