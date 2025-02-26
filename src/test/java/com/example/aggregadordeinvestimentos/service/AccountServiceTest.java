@@ -86,7 +86,8 @@ class AccountServiceTest {
                     "user@mail.com",
                     "1234",
                     Instant.now(),
-                    null
+                    null,
+                    new Role()
             );
 
             var account = new Account(
@@ -138,7 +139,8 @@ class AccountServiceTest {
                     "user@mail.com",
                     "1234",
                     Instant.now(),
-                    null
+                    null,
+                    new Role()
             );
             var account = new Account(
                     accountId,

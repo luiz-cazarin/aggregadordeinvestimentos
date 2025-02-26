@@ -4,9 +4,11 @@ import com.example.aggregadordeinvestimentos.controller.dto.CreateAccountDto;
 import com.example.aggregadordeinvestimentos.controller.dto.CreateUserDto;
 import com.example.aggregadordeinvestimentos.controller.dto.UpdateUserDto;
 import com.example.aggregadordeinvestimentos.entity.Account;
+import com.example.aggregadordeinvestimentos.entity.Role;
 import com.example.aggregadordeinvestimentos.entity.User;
 import com.example.aggregadordeinvestimentos.repository.AccountRepository;
 import com.example.aggregadordeinvestimentos.repository.BillingAddressRepository;
+import com.example.aggregadordeinvestimentos.repository.RoleRepository;
 import com.example.aggregadordeinvestimentos.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -17,6 +19,7 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -39,6 +42,12 @@ class UserServiceTest {
     // Criando um mock do UserRepository
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private RoleRepository roleRepository;
+
+    @Mock
+    private BCryptPasswordEncoder passwordEncoder;
 
     // Criando um mock do AccountRepository
     @Mock
@@ -77,13 +86,23 @@ class UserServiceTest {
         @DisplayName("Should create user with success")
         void shouldCreateUserWithSeccess() {
             // Arrange
+            var role = new Role();
+            role.setName(Role.Values.BASIC.name());
+            role.setRoleId(1L);
+
+            doReturn(role).when(roleRepository).findByName(Role.Values.BASIC.name());
+
+            var encodedPassword = "1234";
+            var password = doReturn(encodedPassword).when(passwordEncoder).encode(encodedPassword);
+
             var user = new User(
                     UUID.randomUUID(),
                     "username",
                     "user@mail.com",
-                    "1234",
+                    password,
                     Instant.now(),
-                    null
+                    null,
+                    new Role()
             );
             // doReturn(user).when(userRepository).save(any()); // any nao e uma boa pratica para cenaarios de sucesso
             doReturn(user).when(userRepository).save(userCaptor.capture()); // passar a estrutura para validar o teste
@@ -92,7 +111,7 @@ class UserServiceTest {
                     "user@mail.com",
                     "1234");
             // Act
-            var output = userService.createUser(input);
+            userService.createUser(input);
             // Assert
 
             var userCaptured = userCaptor.getValue();
@@ -102,7 +121,7 @@ class UserServiceTest {
             // garantir que o username do usuario capturado é igual ao username do usuario criado
             assertEquals(user.getUsername(), userCaptured.getUsername());
             assertEquals(user.getEmail(), userCaptured.getEmail());
-            assertEquals(user.getPassword(), userCaptured.getPassword());
+            assertEquals(encodedPassword, userCaptured.getPassword());
 
         }
 
@@ -110,11 +129,17 @@ class UserServiceTest {
         @DisplayName("Should throw exception when error occours")
         void shouldThrowExceptionWhenErrorOccours() {
             // Arrange
-            doThrow(new RuntimeException()).when(userRepository).save(any());
+            var role = new Role();
+            role.setName(Role.Values.BASIC.name());
+
+            doReturn(role).when(roleRepository).findByName(Role.Values.BASIC.name());
+
             var input = new CreateUserDto(
                     "username",
                     "user@mail.com",
                     "1234");
+
+            doThrow(new RuntimeException()).when(userRepository).save(any());
             // Act & assert
             assertThrows(RuntimeException.class, () -> userService.createUser(input));
         }
@@ -134,7 +159,8 @@ class UserServiceTest {
                     "user@mail.com",
                     "1234",
                     Instant.now(),
-                    null
+                    null,
+                    new Role()
             );
             doReturn(Optional.of(user)).when(userRepository).findById(uuidCaptor.capture());
             // Act
@@ -172,7 +198,8 @@ class UserServiceTest {
                     "user@mail.com",
                     "1234",
                     Instant.now(),
-                    null
+                    null,
+                    new Role()
             );
             doReturn(List.of(user)).when(userRepository).findAll();
 
@@ -197,7 +224,8 @@ class UserServiceTest {
                     "user@mail.com",
                     "1234",
                     Instant.now(),
-                    null
+                    null,
+                    new Role()
             );
             doReturn(Optional.of(user)).when(userRepository).findById(uuidCaptor.capture());
             doNothing().when(userRepository).delete(userCaptor.capture());
@@ -276,7 +304,8 @@ class UserServiceTest {
                     "user@mail.com",
                     "1234",
                     Instant.now(),
-                    null
+                    null,
+                    new Role()
             );
 
 
@@ -334,7 +363,8 @@ class UserServiceTest {
                     "user@mail.com",
                     "1234",
                     Instant.now(),
-                    null
+                    null,
+                    new Role()
             );
 
             var accountDto = new CreateAccountDto(
@@ -371,7 +401,8 @@ class UserServiceTest {
                     "user@mail.com",
                     "1234",
                     Instant.now(),
-                    null
+                    null,
+                    new Role()
             );
 
             var account = new Account(
