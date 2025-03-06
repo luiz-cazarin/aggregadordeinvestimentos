@@ -13,6 +13,7 @@ import com.example.aggregadordeinvestimentos.repository.BillingAddressRepository
 import com.example.aggregadordeinvestimentos.repository.RoleRepository;
 import com.example.aggregadordeinvestimentos.repository.UserRepository;
 import jakarta.persistence.OptimisticLockException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -39,6 +40,10 @@ public class UserService {
 
     public UUID createUser(CreateUserDto createUserDto) {
         var basicRole = roleRepository.findByName(Role.Values.BASIC.name());
+
+        if (userRepository.findByUsername(createUserDto.username()).isPresent()) {
+            throw new DataIntegrityViolationException("Username already exists");
+        }
 
         // DTO -> ENTITY
         var entity = new User(
